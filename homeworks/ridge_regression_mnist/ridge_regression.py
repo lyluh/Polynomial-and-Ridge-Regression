@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt 
 
 from utils import load_dataset, problem
 
@@ -23,8 +24,12 @@ def train(x: np.ndarray, y: np.ndarray, _lambda: float) -> np.ndarray:
     Returns:
         np.ndarray: weight matrix of shape `(d, k)`
             which minimizes Regularized Squared Error on `x` and `y` with hyperparameter `_lambda`.
-    """
-    raise NotImplementedError("Your Code Goes Here")
+    """ 
+    d = x.shape[1]
+    reg_matrix = np.eye(d) * _lambda
+
+    return np.linalg.solve(x.T @ x + reg_matrix, x.T @ y)
+
 
 
 @problem.tag("hw1-A")
@@ -44,7 +49,10 @@ def predict(x: np.ndarray, w: np.ndarray) -> np.ndarray:
     Returns:
         np.ndarray: predictions matrix of shape `(n,)` or `(n, 1)`.
     """
-    raise NotImplementedError("Your Code Goes Here")
+    scores = x @ w
+    predicted_labels = np.argmax(scores, axis=1)
+
+    return predicted_labels
 
 
 @problem.tag("hw1-A")
@@ -72,15 +80,16 @@ def one_hot(y: np.ndarray, num_classes: int) -> np.ndarray:
         ]
         ```
     """
-    raise NotImplementedError("Your Code Goes Here")
+    n = y.shape[0]
+    one_hot_y = np.zeros((n, num_classes))
+    one_hot_y[np.arange(n), y] = 1
+    return one_hot_y
 
 
 def main():
-
     (x_train, y_train), (x_test, y_test) = load_dataset("mnist")
     # Convert to one-hot
     y_train_one_hot = one_hot(y_train.reshape(-1), 10)
-
     _lambda = 1e-4
 
     w_hat = train(x_train, y_train_one_hot, _lambda)
